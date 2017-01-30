@@ -231,6 +231,16 @@ func (m *Middleware) Authorize(w http.ResponseWriter, r *http.Request, assertion
 			// If IDP initiated auth is allowed then RelayState is probably actually
 			// the URL that we should be redirecting to on successful auth
 			redirectURI = r.Form.Get("RelayState")
+			u, _ := url.Parse(m.ServiceProvider.AcsURL)
+			// Add host to redirect
+			// There appears to be a bug where sometimes it redirects to a bad host
+			ru, err := url.Parse(fmt.Sprintf("%s://%s%s", u.Scheme, u.Host, redirectURI))
+			if err != nil {
+				log.Printf("Error parsing RelayState data: %s", err.Error())
+				redirectURI = "/"
+			} else {
+				redirectURI = ru.String()
+			}
 		} else {
 			state, err := jwt.Parse(stateCookie.Value, func(t *jwt.Token) (interface{}, error) {
 				return secretBlock.Bytes, nil
