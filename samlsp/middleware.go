@@ -57,7 +57,7 @@ type Middleware struct {
 	CookieMaxAge      time.Duration
 }
 
-const defaultCookieMaxAge = time.Hour
+const defaultCookieMaxAge = 12 * time.Hour
 const defaultCookieName = "token"
 
 func randomBytes(n int) []byte {
